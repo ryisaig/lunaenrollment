@@ -10,8 +10,8 @@ import {
   } from "react-router-dom";
 import ViewTable from '../../component/ViewTable';
 import { selectField, checkListField, checkField, scheduleField, defaultField } from '../../component/Fields';
-import { Button, Form, FormControl, InputGroup } from 'react-bootstrap';
-import { Add, Search, RemoveCircleOutline } from '@material-ui/icons';
+import { Button, Card, Form, FormControl, InputGroup } from 'react-bootstrap';
+import { Add, Search, RemoveCircleOutline, NavigateNext, Send } from '@material-ui/icons';
 import swal from 'sweetalert';
 
 class NewEnrollment extends React.Component {
@@ -20,13 +20,14 @@ class NewEnrollment extends React.Component {
       const sessionTabId = ""
     }
     state = {
-        title: <><Link to="../enrollment" style={{color: "#17a2b8"}}>Enrollment</Link> > Enroll New Student</>,
+        title: <><Link to="../" style={{color: "#17a2b8"}}>Home</Link> <NavigateNext/> New Student</>,
         action: "create",
         resource: "student",
         submitUrl: BASE_SERVER_URL + "student",
         method: "POST",
         successMessage: "New student has been created",
         enteredClassCode: "",
+        submitDisabled: false,
         fields: {
           "course": {
             id: "course",
@@ -468,6 +469,7 @@ class NewEnrollment extends React.Component {
           result['teacher'] = res.data.teacher.lastName.toUpperCase() + ", " + res.data.teacher.firstName
           result['room'] = res.data.room.roomName;
           result['status'] = res.data.status;
+          result['id'] = res.data.id;
 
           let schedule = "";
           res.data.schedule.map(function(sched, i){
@@ -512,6 +514,7 @@ class NewEnrollment extends React.Component {
       if(this.state.table.data.length < 1){
         swal("Error!", "Classes should not be empty", "error");
       } else {
+        this.setState({submitDisabled: true});
 
         let classes = [];
         this.state.table.data.map(function(item){
@@ -527,23 +530,21 @@ class NewEnrollment extends React.Component {
               username: GenericRequest().username,
               application: GenericRequest().application
           },
-          application: 'ADMIN_PORTAL',
+          application: 'ENROLLMENT_PORTAL',
           clientIp: '',
-          enrollment: {
-            student: {
-              lastName: fields['lastName'].value,
-              firstName: fields['firstName'].value,
-              middleName: fields['middleName'].value,
-              gender: fields['gender'].value,
-              birthday: fields['birthday'].value,
-              civilStatus: fields['civilStatus'].value,
-              presentAddress: fields['presentAddress'].value,
-              mobileNumber: fields['mobileNumber'].value,
-              emailAddress: fields['emailAddress'].value,
-              occupation: fields['occupation'].value,
-              guardianName1: fields['guardianName1'].value,
-              guardianName2: fields['guardianName2'].value,
-            },
+          admission: {          
+            lastName: fields['lastName'].value,
+            firstName: fields['firstName'].value,
+            middleName: fields['middleName'].value,
+            gender: fields['gender'].value,
+            birthday: fields['birthday'].value,
+            civilStatus: fields['civilStatus'].value,
+            presentAddress: fields['presentAddress'].value,
+            mobileNumber: fields['mobileNumber'].value,
+            emailAddress: fields['emailAddress'].value,
+            occupation: fields['occupation'].value,
+            guardianName1: fields['guardianName1'].value,
+            guardianName2: fields['guardianName2'].value,           
             yearLevel: fields['year'].value,
             course: {
               id: fields['course'].value,
@@ -552,10 +553,10 @@ class NewEnrollment extends React.Component {
             classes: classes
           }         
         }
-        axios.post(BASE_SERVER_URL + 'enrollment/new', params)
+        axios.post(BASE_SERVER_URL + 'admission', params)
         .then(res => {
-            swal("Success!", "New enrollment has been submitted", "success").then(()=>{
-              window.location.reload();
+            swal("Success!", "Admission form has been submitted. Please copy this tracking number to modify.", "success").then(()=>{
+              window.location = '../'
             })
 
         }).catch( e => {
@@ -571,7 +572,7 @@ class NewEnrollment extends React.Component {
           
           let courseOptions = [];
           let objectReference={0:null};
-          res.data.map(function(course){
+          res.data && res.data.map(function(course){
             courseOptions.push({key: course['id'], value: course['courseCode']});
             objectReference[course['id']]=course;
           },
@@ -596,14 +597,23 @@ class NewEnrollment extends React.Component {
     render(){
 
        return ( 
-        <div style={{padding: '25px'}}>
+        <div style={{padding: '50px', paddingLeft: '100px'}}>
           <form onSubmit={this.onSubmit.bind(this)} >
             <div>
                 <h5>{this.state.title}</h5><br/>
-               
-                <Button type="submit" variant="outline-info">
-                    Submit
-                </Button><br/><br/>
+                <Card style={{backgroundColor: '#EEEEEE', fontSize: '14px'}}>
+                  <Card.Body>
+                    <span style={{fontWeight: 'bold'}}>Pls. prepare the ff. requirements:</span><br/><br/>
+                    <ul>
+                      {/* <li>TODO Pull this from database</li> */}
+                      <li>Birth Certificate</li>
+                      <li>Form 138</li>
+                      <li>Good Moral</li>
+                      <li>3 1x1 Pictures</li>
+                    </ul>
+                  </Card.Body>
+                </Card>     
+                <br/>           
                 <table>
                     <tbody>
                         <tr>
@@ -650,17 +660,16 @@ class NewEnrollment extends React.Component {
             <br/>
             <h5>Classes</h5>
             <InputGroup className="mb-3" style={{width: '450px'}}>
-              <FormControl style={{height: '40px'}} onChange={this.classFormChange.bind(this)}/>
+              <FormControl placeholder="Enter class code" style={{height: '40px'}} onChange={this.classFormChange.bind(this)}/>
               <InputGroup.Append style={{marginRight: '10px'}}> 
                  <Button variant="outline-info" onClick={this.addClassToList.bind(this)}><Add/></Button>
              </InputGroup.Append>
-             <Button variant="outline-info" onClick={this.autogenerateClasses.bind(this)}>Auto-generate</Button>
              </InputGroup>
             <div>
                 <ViewTable values={this.state.table}/>
             </div>
             <br/><br/>
-            <Button type="submit" variant="outline-info">
+            <Button disabled={this.state.submitDisabled} type="submit" variant="outline-info">
                     Submit
                 </Button>
                 </form>

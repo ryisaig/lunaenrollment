@@ -11,16 +11,16 @@ import {
 import ViewTable from '../../component/ViewTable';
 import { selectField, checkListField, checkField, scheduleField, defaultField } from '../../component/Fields';
 import { Button, Form, FormControl, InputGroup } from 'react-bootstrap';
-import { Add, Search, RemoveCircleOutline } from '@material-ui/icons';
+import { Add, Search, RemoveCircleOutline, NavigateNext } from '@material-ui/icons';
 import swal from 'sweetalert';
 
-class NewEnrollment extends React.Component {
+class EditNewEnrollmentDetails extends React.Component {
     constructor(props) {
       super(props);
       const sessionTabId = ""
     }
     state = {
-      title: <><Link to="../../../../enrollment" style={{color: "#17a2b8"}}>Enrollment</Link> > Edit Enrollment</>,
+      title: <><Link to="./details" style={{color: "#17a2b8"}}>Admission</Link> <NavigateNext/> Edit</>,
       action: "create",
         resource: "student",
         submitUrl: BASE_SERVER_URL + "student",
@@ -51,7 +51,7 @@ class NewEnrollment extends React.Component {
             overrideStyle: {width: "70px"},
             isRequired: true,
             type: "number",
-            value: 1,
+            defaultValue: 1,
             options: [],
             objectReference:{},
             selectValueChange: function(value){
@@ -528,36 +528,32 @@ class NewEnrollment extends React.Component {
               username: GenericRequest().username,
               application: GenericRequest().application
           },
-          application: 'ADMIN_PORTAL',
+          application: 'ENROLLMENT_PORTAL',
           clientIp: '',
-          enrollment: {
-            id: this.state.resourceId,
-            student: {
-              id: this.state.studentId,
-              lastName: fields['lastName'].value,
-              firstName: fields['firstName'].value,
-              middleName: fields['middleName'].value,
-              gender: fields['gender'].value,
-              birthday: fields['birthday'].value,
-              civilStatus: fields['civilStatus'].value,
-              presentAddress: fields['presentAddress'].value,
-              mobileNumber: fields['mobileNumber'].value,
-              emailAddress: fields['emailAddress'].value,
-              occupation: fields['occupation'].value,
-              guardianName1: fields['guardianName1'].value,
-              guardianName2: fields['guardianName2'].value,
-            },
+          admission: {            
+            lastName: fields['lastName'].value,
+            firstName: fields['firstName'].value,
+            middleName: fields['middleName'].value,
+            gender: fields['gender'].value,
+            birthday: fields['birthday'].value,
+            civilStatus: fields['civilStatus'].value,
+            presentAddress: fields['presentAddress'].value,
+            mobileNumber: fields['mobileNumber'].value,
+            emailAddress: fields['emailAddress'].value,
+            occupation: fields['occupation'].value,
+            guardianName1: fields['guardianName1'].value,
+            guardianName2: fields['guardianName2'].value,
             yearLevel: fields['year'].value,
             course: {
               id: fields['course'].value,
             },
-            isRegular: fields["isRegular"].checked,
+            regular: fields["isRegular"].checked,
             classes: classes
           }         
         }
-        axios.patch(BASE_SERVER_URL + 'enrollment/new/' + this.state.resourceId, params)
+        axios.patch(BASE_SERVER_URL + 'admission/' + this.state.resourceId, params)
         .then(res => {
-            swal("Success!", "New enrollment has been submitted", "success").then(()=>{
+            swal("Success!", "Admission form has been updated", "success").then(()=>{
               window.location.reload();
             })
 
@@ -593,30 +589,30 @@ class NewEnrollment extends React.Component {
 
 
     populateInitialValues(id){
-      axios.get(BASE_SERVER_URL+ 'enrollment/' + id,  { params: {...GenericRequest()}})
+      axios.get(BASE_SERVER_URL+ 'admission/' + id,  { params: {...GenericRequest()}})
       .then(res => {
 
         let fields = this.state.fields;
 
         fields["course"].value = res.data.course.id      
-        fields['lastName'].value = res.data.student.lastName
-        fields['firstName'].value = res.data.student.firstName
-        fields['middleName'].value = res.data.student.middleName
-        fields['gender'].value = res.data.student.gender
-        fields['birthday'].value = res.data.student.birthday
-        fields['civilStatus'].value = res.data.student.civilStatus
-        fields['presentAddress'].value = res.data.student.presentAddress
-        fields['mobileNumber'].value = res.data.student.mobileNumber
-        fields['emailAddress'].value = res.data.student.emailAddress
-        fields['occupation'].value = res.data.student.occupation
-        fields['guardianName1'].value = res.data.student.guardianName1
-        fields['guardianName2'].value = res.data.student.guardianName2
+        fields['lastName'].value = res.data.lastName
+        fields['firstName'].value = res.data.firstName
+        fields['middleName'].value = res.data.middleName
+        fields['gender'].value = res.data.gender
+        fields['birthday'].value = res.data.birthday
+        fields['civilStatus'].value = res.data.civilStatus
+        fields['presentAddress'].value = res.data.presentAddress
+        fields['mobileNumber'].value = res.data.mobileNumber
+        fields['emailAddress'].value = res.data.emailAddress
+        fields['occupation'].value = res.data.occupation
+        fields['guardianName1'].value = res.data.guardianName1
+        fields['guardianName2'].value = res.data.guardianName2
         fields['year'].value = res.data.yearLevel
-        fields["isRegular"].checked = res.data.isRegular;
+        fields["isRegular"].checked = res.data.regular;
         fields["age"].value = this.calculate_age(fields['birthday'].value);
-        fields["studentNumber"].value = res.data.student.studentNumber;
+        fields["studentNumber"].value = res.data.studentNumber;
 
-        this.state.studentId = res.data.student.id;
+        this.state.studentId = res.data.id;
         let table = this.state.table;
 
         table.data = [];
@@ -727,4 +723,4 @@ class NewEnrollment extends React.Component {
 
 }
 
-export default NewEnrollment;
+export default EditNewEnrollmentDetails;

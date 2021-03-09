@@ -8,6 +8,7 @@ import {
   Link
 } from "react-router-dom";
 import ViewTable from './ViewTable';
+import { NavigateNext } from '@material-ui/icons';
 
 function ViewDetails(props) {
 
@@ -22,7 +23,7 @@ function ViewDetails(props) {
                         <tbody>
                             <tr>             
                                 <td style={{border: "none", padding: '25px'}}>
-                                    <h5 style={{ marginBottom: '30px'}}><Link as={Link} to={"../../../" + props.values.type}style={{color: '#17a2b8'}}>{props.values.title}</Link> > {props.values.resource}</h5>
+                                    <h5 style={{ marginBottom: '30px'}}><Link as={Link} to={"../../../" + props.values.type}style={{color: '#17a2b8'}}>{props.values.title}</Link> <NavigateNext/> {props.values.resource}</h5>
 
                                     <table style={{borderRadius: '10px'}}>
                                         <tbody>
@@ -39,7 +40,7 @@ function ViewDetails(props) {
                                                             </td>
                                                             {
                                                                 i == 0 && props.values.enableEdit && (<td style={{padding: '0', border: 'none', paddingLeft: '15px', paddingTop: '5px'}}>
-                                                                <Button as={Link} variant="outline-info" to={"/" + props.values.type  + "/" + props.values.resourceId + ( props.values.subtype ? "/" + props.values.subtype + "/edit" : "/details/edit" )}>Edit</Button>
+                                                                <Button as={Link} variant="outline-info" to="./edit">Edit</Button>
                                                                 </td>)
                                                             }
                                                         </tr>
