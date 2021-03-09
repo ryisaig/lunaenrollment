@@ -11,16 +11,16 @@ import {
 import ViewTable from '../../component/ViewTable';
 import { selectField, checkListField, checkField, scheduleField, defaultField } from '../../component/Fields';
 import { Button, Form, FormControl, InputGroup } from 'react-bootstrap';
-import { Add, Search, RemoveCircleOutline } from '@material-ui/icons';
+import { Add, Search, RemoveCircleOutline, NavigateNext } from '@material-ui/icons';
 import swal from 'sweetalert';
 
-class NewEnrollment extends React.Component {
+class EditOldEnrollmentDetails extends React.Component {
     constructor(props) {
       super(props);
       const sessionTabId = ""
     }
     state = {
-      title: <><Link to="../../../../enrollment" style={{color: "#17a2b8"}}>Enrollment</Link> > Edit Enrollment</>,
+      title: <><Link to="./details" style={{color: "#17a2b8"}}>Pre-registration</Link> <NavigateNext/> Edit</>,
       action: "create",
         resource: "student",
         submitUrl: BASE_SERVER_URL + "student",
@@ -51,7 +51,7 @@ class NewEnrollment extends React.Component {
             overrideStyle: {width: "70px"},
             isRequired: true,
             type: "number",
-            value: 1,
+            defaultValue: 1,
             options: [],
             objectReference:{},
             selectValueChange: function(value){
@@ -63,7 +63,7 @@ class NewEnrollment extends React.Component {
           "isRegular" : {
             id: "isRegular",
             name: "isRegular",
-            label: "Regular",
+            label: <label>Regular <span style={{color: "red", fontSize: "12px"}}>*Keep this unchecked if you are enrolling as irregular student</span></label>,
             placeholder: "",
             overrideStyle: {},
             isRequired: false,
@@ -406,30 +406,28 @@ class NewEnrollment extends React.Component {
               username: GenericRequest().username,
               application: GenericRequest().application
           },
-          application: 'ADMIN_PORTAL',
+          application: 'ADMIN',
           clientIp: '',
-          enrollment: {
+          preregistration: {
             id: this.state.resourceId,
-            student: {
-              id: this.state.studentId,
-              lastName: fields['lastName'].value,
-              firstName: fields['firstName'].value,
-              middleName: fields['middleName'].value,
-              presentAddress: fields['presentAddress'].value,
-              mobileNumber: fields['mobileNumber'].value,
-              emailAddress: fields['emailAddress'].value,
-            },
+            studentNumber:  fields['studentNumber'].value,
+            lastName: fields['lastName'].value,
+            firstName: fields['firstName'].value,
+            middleName: fields['middleName'].value,
+            presentAddress: fields['presentAddress'].value,
+            mobileNumber: fields['mobileNumber'].value,
+            emailAddress: fields['emailAddress'].value,
             yearLevel: fields['year'].value,
             course: {
               id: fields['course'].value,
             },
-            isRegular: fields["isRegular"].checked,
+            regular: fields["isRegular"].checked,
             classes: classes
           }         
         }
-        axios.patch(BASE_SERVER_URL + 'enrollment/old/' + this.state.resourceId, params)
+        axios.patch(BASE_SERVER_URL + 'preregistration/' + this.state.resourceId, params)
         .then(res => {
-            swal("Success!", "New enrollment has been submitted", "success").then(()=>{
+            swal("Success!", "Pre-reg form has been updated", "success").then(()=>{
               window.location.reload();
             })
 
@@ -465,23 +463,23 @@ class NewEnrollment extends React.Component {
 
 
     populateInitialValues(id){
-      axios.get(BASE_SERVER_URL+ 'enrollment/' + id,  { params: {...GenericRequest()}})
+      axios.get(BASE_SERVER_URL+ 'preregistration/' + id,  { params: {...GenericRequest()}})
       .then(res => {
 
         let fields = this.state.fields;
 
         fields["course"].value = res.data.course.id      
-        fields['lastName'].value = res.data.student.lastName
-        fields['firstName'].value = res.data.student.firstName
-        fields['middleName'].value = res.data.student.middleName
-        fields['presentAddress'].value = res.data.student.presentAddress
-        fields['mobileNumber'].value = res.data.student.mobileNumber
-        fields['emailAddress'].value = res.data.student.emailAddress
+        fields['lastName'].value = res.data.lastName
+        fields['firstName'].value = res.data.firstName
+        fields['middleName'].value = res.data.middleName
+        fields['presentAddress'].value = res.data.presentAddress
+        fields['mobileNumber'].value = res.data.mobileNumber
+        fields['emailAddress'].value = res.data.emailAddress
         fields['year'].value = res.data.yearLevel
-        fields["isRegular"].checked = res.data.isRegular;
-        fields["studentNumber"].value = res.data.student.studentNumber;
+        fields["isRegular"].checked = res.data.regular;
+        fields["studentNumber"].value = res.data.studentNumber;
 
-        this.state.studentId = res.data.student.id;
+        this.state.studentId = res.data.id;
         let table = this.state.table;
 
         table.data = [];
@@ -577,4 +575,4 @@ class NewEnrollment extends React.Component {
 
 }
 
-export default NewEnrollment;
+export default EditOldEnrollmentDetails;

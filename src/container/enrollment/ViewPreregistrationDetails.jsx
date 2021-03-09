@@ -3,22 +3,15 @@ import ViewDetails from '../../component/ViewDetails';
 import axios from 'axios'
 import GenericRequest from '../../utils/GenericRequest';
 import { BASE_SERVER_URL } from '../../utils/BaseServerUrl';
-import { Button } from 'react-bootstrap';
 
-import {
-    Link
-  } from "react-router-dom";
-import swal from 'sweetalert';
-import { RemoveCircleOutline } from '@material-ui/icons';
-  
 class ViewClassDetails extends React.Component {
 
     state = {
-      title: "Enrollments",
+      title: "Home",
       resource: "",
       enableEdit: true,
       data: {},
-      type: "enrollment",
+      type: "",
       subtype: "old",
       resourceId: 0,
       fields: [
@@ -43,9 +36,9 @@ class ViewClassDetails extends React.Component {
           value: ""      
         },
         {
-          id: "studentNumber",
-          label: "Student Number",
-          value: ""    
+          id: "isRegular",
+          label: "Is Regular",
+          value: ""
         },
         {
           id: "lastName",
@@ -125,16 +118,17 @@ class ViewClassDetails extends React.Component {
     }
 
     getEnrollment(id){
-      axios.get(BASE_SERVER_URL + 'enrollment/'+id,  { params: {...GenericRequest()}})
+      axios.get(BASE_SERVER_URL + 'preregistration/'+id,  { params: {...GenericRequest()}})
       .then(res => {
           //get class 
           let {fields} = this.state;
 
 
-          if(res.data.status == 'CONFIRMED'){
-            fields.splice(2, 0, {id: 'receiptNumber', label: 'Receipt Number'})
-          } else if(res.data.status == 'DISCARDED'){
-            fields.splice(2, 0, {id: 'discardReason', label: 'Discard Reason'})
+          // if(res.data.status == 'CONFIRMED'){
+          //   fields.splice(2, 0, {id: 'receiptNumber', label: 'Receipt Number'})
+          // } 
+          if(res.data.status == 'RETURNED'){
+            fields.splice(2, 0, {id: 'remarks', label: 'Return Reason'})
           }
 
           fields.forEach(function(field){
@@ -142,20 +136,20 @@ class ViewClassDetails extends React.Component {
               field.value = "" + res.data.course.courseCode;
             } else if(field.id == 'yearLevel'){
               field.value = "" + res.data.yearLevel;
-            }else if(field.id == 'studentNumber'){
-              field.value = "" + res.data.student.studentNumber;
             } else if(field.id == 'lastName'){
-              field.value = "" + res.data.student.lastName;
+              field.value = "" + res.data.lastName;
             }else if(field.id == 'firstName'){
-              field.value = "" + res.data.student.firstName;
+              field.value = "" + res.data.firstName;
             }else if(field.id == 'middleName'){
-              field.value = "" + res.data.student.middleName;
-            }else if(field.id == 'presentAddress'){
-              field.value = "" + res.data.student.presentAddress;
+              field.value = "" + res.data.middleName;
+            } else if(field.id == 'isRegular'){
+              field.value  = res.data.isRegular ? "Yes" : "No";
+            } else if(field.id == 'presentAddress'){
+              field.value = "" + res.data.presentAddress;
             }else if(field.id == 'mobileNumber'){
-              field.value = "" + res.data.student.mobileNumber;
+              field.value = "" + res.data.mobileNumber;
             }else if(field.id == 'emailAddress'){
-              field.value = "" + res.data.student.emailAddress;
+              field.value = "" + res.data.emailAddress;
             }else if(field.id == 'updatedBy'){
               if(res.data['updatedBy']){
                 field.value = "" + res.data.updatedBy.schoolId;
@@ -198,7 +192,7 @@ class ViewClassDetails extends React.Component {
             });
           this.state.tables[0] = table;
           
-          this.setState({fields: fields, resource: res.data.student.studentNumber, table: table})
+          this.setState({fields: fields, resource: res.data.firstName + " " + res.data.lastName, table: table})
       });
     }
 

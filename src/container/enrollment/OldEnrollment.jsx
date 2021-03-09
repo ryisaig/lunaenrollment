@@ -10,8 +10,8 @@ import {
   } from "react-router-dom";
 import ViewTable from '../../component/ViewTable';
 import { selectField, checkListField, checkField, scheduleField, defaultField } from '../../component/Fields';
-import { Button, Form, FormControl, InputGroup } from 'react-bootstrap';
-import { Add, Search, RemoveCircleOutline } from '@material-ui/icons';
+import { Button, Card, Form, FormControl, InputGroup } from 'react-bootstrap';
+import { Add, Search, RemoveCircleOutline, NavigateNext } from '@material-ui/icons';
 import swal from 'sweetalert';
 
 class NewEnrollment extends React.Component {
@@ -20,13 +20,14 @@ class NewEnrollment extends React.Component {
       const sessionTabId = ""
     }
     state = {
-        title: <><Link to="../enrollment" style={{color: "#17a2b8"}}>Enrollment</Link> > Enroll Old Student</>,
+        title: <><Link to="../" style={{color: "#17a2b8"}}>Home</Link> <NavigateNext/> Old Student</>,
         action: "create",
         resource: "student",
         submitUrl: BASE_SERVER_URL + "student",
         method: "POST",
         successMessage: "New student has been created",
         enteredClassCode: "",
+        submitDisabled: false,
         fields: {
           "course": {
             id: "course",
@@ -63,7 +64,7 @@ class NewEnrollment extends React.Component {
           "isRegular" : {
             id: "isRegular",
             name: "isRegular",
-            label: "Regular",
+            label: <label>Regular <span style={{color: "red", fontSize: "12px"}}>*Keep this unchecked if you are enrolling as irregular student</span></label>,
             placeholder: "",
             overrideStyle: {},
             isRequired: false,
@@ -89,7 +90,34 @@ class NewEnrollment extends React.Component {
             selectValueChange: function(value){
               let fields = this.state.fields;
               fields["studentNumber"].value = value;
-              this.setState({fields: fields})
+
+              const regex = RegExp('^[\\d]{4}-[\\d]{6}$');
+              if(regex.test(value))  {
+                axios.get(BASE_SERVER_URL + 'student/byStudentNumber/' + value,  { params: {...GenericRequest()}})
+                .then(res => {
+                  if(res.data || res.data != ""){
+                    fields['lastName'].value = res.data.lastName;
+                    fields['firstName'].value = res.data.firstName;
+                    fields['middleName'].value = res.data.middleName;
+                    fields['presentAddress'].value = res.data.presentAddress;
+                    fields['mobileNumber'].value = res.data.mobileNumber;
+                    fields['emailAddress'].value = res.data.emailAddress;
+
+                    let objectReference = res.data;
+                    this.setState({fields: fields, objectReference: objectReference})
+
+
+                  } else {
+                    swal("Warning!", "Student number is not found.", "warning");
+                  }
+                }).catch(e => {
+                  console.log(e)
+                  swal("Warning!", "Student number is not found.", "warning");
+                });
+              } else {
+                this.setState({fields: fields})
+              }  
+
             }.bind(this)
           },
           "lastName" : {
@@ -294,7 +322,7 @@ class NewEnrollment extends React.Component {
                 result['subject'] = item.subject.subjectCode;
                 result['section'] = item.section.course.courseCode + " " + item.section.year + "-" + item.section.sectionNumber;
                 result['teacher'] = item.teacher.lastName.toUpperCase() + ", " + item.teacher.firstName
-                result['room'] = item.room.roomName;
+                result['room'] = item.room ? item.room.roomName: "TBD"
                 result['status'] = item.status;
                 let schedule = "";
                 item.schedule.map(function(sched, i){
@@ -358,6 +386,7 @@ class NewEnrollment extends React.Component {
           result['teacher'] = res.data.teacher.lastName.toUpperCase() + ", " + res.data.teacher.firstName
           result['room'] = res.data.room.roomName;
           result['status'] = res.data.status;
+          result['id'] = res.data.id;
 
           let schedule = "";
           res.data.schedule.map(function(sched, i){
@@ -399,9 +428,14 @@ class NewEnrollment extends React.Component {
       
       e.preventDefault();
 
+
       if(this.state.table.data.length < 1){
+
         swal("Error!", "Classes should not be empty", "error");
+
       } else {
+        this.setState({submitDisabled: true});
+
 
         let classes = [];
         this.state.table.data.map(function(item){
@@ -417,18 +451,16 @@ class NewEnrollment extends React.Component {
               username: GenericRequest().username,
               application: GenericRequest().application
           },
-          application: 'ADMIN_PORTAL',
+          application: 'ENROLLMENT_PORTAL',
           clientIp: '',
-          enrollment: {
-            student: {
-              studentNumber: fields['studentNumber'].value,
-              lastName: fields['lastName'].value,
-              firstName: fields['firstName'].value,
-              middleName: fields['middleName'].value,
-              presentAddress: fields['presentAddress'].value,
-              mobileNumber: fields['mobileNumber'].value,
-              emailAddress: fields['emailAddress'].value
-            },
+          preregistration: {
+            studentNumber: fields['studentNumber'].value,
+            lastName: fields['lastName'].value,
+            firstName: fields['firstName'].value,
+            middleName: fields['middleName'].value,
+            presentAddress: fields['presentAddress'].value,
+            mobileNumber: fields['mobileNumber'].value,
+            emailAddress: fields['emailAddress'].value,           
             yearLevel: fields['year'].value,
             course: {
               id: fields['course'].value,
@@ -437,10 +469,10 @@ class NewEnrollment extends React.Component {
             classes: classes
           }         
         }
-        axios.post(BASE_SERVER_URL + 'enrollment/old', params)
+        axios.post(BASE_SERVER_URL + 'preregistration', params)
         .then(res => {
-            swal("Success!", "New enrollment has been submitted", "success").then(()=>{
-              window.location.reload();
+            swal("Success!", "Pre-registration form has been submitted", "success").then(()=>{
+              window.location = "../";
             })
 
         }).catch( e => {
@@ -481,14 +513,21 @@ class NewEnrollment extends React.Component {
     render(){
 
        return ( 
-        <div style={{padding: '25px'}}>
+        <div style={{padding: '50px', paddingLeft: '100px'}}>
           <form onSubmit={this.onSubmit.bind(this)} >
             <div>
                 <h5>{this.state.title}</h5><br/>
-               
-                <Button type="submit" variant="outline-info">
-                    Submit
-                </Button><br/><br/>
+                <Card style={{backgroundColor: '#EEEEEE', fontSize: '14px'}}>
+                  <Card.Body>
+                    <span style={{fontWeight: 'bold'}}>Pls. prepare the ff. requirements:</span><br/><br/>
+                    <ul>
+                      {/* <li>TODO Pull this from database</li> */}
+                      <li>Certificate of Grades</li>
+                      <li>Clearance Form</li>                  
+                    </ul>
+                  </Card.Body>
+                </Card>     
+                <br/>   
                 <table>
                     <tbody>
                         <tr>
@@ -520,17 +559,16 @@ class NewEnrollment extends React.Component {
             <br/>
             <h5>Classes</h5>
             <InputGroup className="mb-3" style={{width: '450px'}}>
-              <FormControl style={{height: '40px'}} onChange={this.classFormChange.bind(this)}/>
+              <FormControl placeholder="Enter class code" style={{height: '40px'}} onChange={this.classFormChange.bind(this)}/>
               <InputGroup.Append style={{marginRight: '10px'}}> 
                  <Button variant="outline-info" onClick={this.addClassToList.bind(this)}><Add/></Button>
              </InputGroup.Append>
-             <Button variant="outline-info" onClick={this.autogenerateClasses.bind(this)}>Auto-generate</Button>
              </InputGroup>
             <div>
                 <ViewTable values={this.state.table}/>
             </div>
             <br/><br/>
-            <Button type="submit" variant="outline-info">
+            <Button disabled={this.state.submitDisabled} type="submit" variant="outline-info">
                     Submit
                 </Button>
                 </form>
