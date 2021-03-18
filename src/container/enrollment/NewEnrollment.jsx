@@ -202,20 +202,20 @@ class NewEnrollment extends React.Component {
               this.setState({fields: fields})
             }.bind(this)
           },
-          "occupation" : {
-            id: "occupation",
-            name: "occupation",
-            label: "Occupation",
-            placeholder: "",
-            overrideStyle: {},
-            isRequired: true,
-            type: "text",
-            selectValueChange: function(value){
-              let fields = this.state.fields;
-              fields["occupation"].value = value;
-              this.setState({fields: fields})
-            }.bind(this)
-          },
+          // "occupation" : {
+          //   id: "occupation",
+          //   name: "occupation",
+          //   label: "Occupation",
+          //   placeholder: "",
+          //   overrideStyle: {},
+          //   isRequired: true,
+          //   type: "text",
+          //   selectValueChange: function(value){
+          //     let fields = this.state.fields;
+          //     fields["occupation"].value = value;
+          //     this.setState({fields: fields})
+          //   }.bind(this)
+          // },
           "emailAddress" : {
             id: "emailAddress",
             name: "emailAddress",
@@ -261,7 +261,7 @@ class NewEnrollment extends React.Component {
           "guardianName1" : {
             id: "guardianName1",
             name: "guardianName1",
-            label: "Guardian 1",
+            label: "Parent / Guardian",
             placeholder: "",
             overrideStyle: {},
             isRequired: true,
@@ -273,20 +273,20 @@ class NewEnrollment extends React.Component {
             }.bind(this)
           },
           
-          "guardianName2" : {
-            id: "guardianName2",
-            name: "guardianName2",
-            label: "Guardian 2",
-            placeholder: "",
-            overrideStyle: {},
-            isRequired: false,
-            type: "text",
-            selectValueChange: function(value){
-              let fields = this.state.fields;
-              fields["guardianName2"].value = value;
-              this.setState({fields: fields})
-            }.bind(this)
-          },
+          // "guardianName2" : {
+          //   id: "guardianName2",
+          //   name: "guardianName2",
+          //   label: "Guardian 2",
+          //   placeholder: "",
+          //   overrideStyle: {},
+          //   isRequired: false,
+          //   type: "text",
+          //   selectValueChange: function(value){
+          //     let fields = this.state.fields;
+          //     fields["guardianName2"].value = value;
+          //     this.setState({fields: fields})
+          //   }.bind(this)
+          // },
         },
         table: 
             {
@@ -385,6 +385,7 @@ class NewEnrollment extends React.Component {
 
     componentWillMount(){
         this.getCourses();    
+        this.getRequirements();
     }
 
     autogenerateClasses(){
@@ -542,9 +543,9 @@ class NewEnrollment extends React.Component {
             presentAddress: fields['presentAddress'].value,
             mobileNumber: fields['mobileNumber'].value,
             emailAddress: fields['emailAddress'].value,
-            occupation: fields['occupation'].value,
+            // occupation: fields['occupation'].value,
             guardianName1: fields['guardianName1'].value,
-            guardianName2: fields['guardianName2'].value,           
+            // guardianName2: fields['guardianName2'].value,           
             yearLevel: fields['year'].value,
             course: {
               id: fields['course'].value,
@@ -589,7 +590,12 @@ class NewEnrollment extends React.Component {
         })
     }
 
-    
+    getRequirements(){
+      axios.get(BASE_SERVER_URL + 'requirement',  { params: {...GenericRequest(), keyword: this.state.keyword}})
+      .then(res => {
+          this.setState({requirements: res.data})
+      })
+  }
 
     classFormChange(e){
       this.setState({enteredClassCode: e.target.value})
@@ -605,11 +611,19 @@ class NewEnrollment extends React.Component {
                   <Card.Body>
                     <span style={{fontWeight: 'bold'}}>Pls. prepare the ff. requirements:</span><br/><br/>
                     <ul>
-                      {/* <li>TODO Pull this from database</li> */}
-                      <li>Birth Certificate</li>
-                      <li>Form 138</li>
-                      <li>Good Moral</li>
-                      <li>3 1x1 Pictures</li>
+                    {
+                        this.state.requirements && this.state.requirements.map((r)=>{
+                          return r.type === "NEW STUDENT" && <li>{r.requirementName}</li>
+                        })
+                      }
+                    </ul>
+                    <span>* For transferees</span><br/><br/>
+                    <ul>
+                    {
+                        this.state.requirements && this.state.requirements.map((r)=>{
+                          return r.type === "TRANSFEREE" && <li>{r.requirementName}</li>
+                        })
+                      }
                     </ul>
                   </Card.Body>
                 </Card>     
@@ -635,7 +649,7 @@ class NewEnrollment extends React.Component {
                         <tr>
                             <td style={{padding: "0px", border: "none" }}>{this.fieldRenderer(this.state.fields["gender"])}</td>
                             <td style={{padding: "0px", border: "none", paddingLeft: "15px"}}>{this.fieldRenderer(this.state.fields["civilStatus"])}</td>
-                            <td style={{padding: "0px", border: "none", paddingLeft: "15px" }}>{this.fieldRenderer(this.state.fields["occupation"])}</td>
+                            {/* <td style={{padding: "0px", border: "none", paddingLeft: "15px" }}>{this.fieldRenderer(this.state.fields["occupation"])}</td> */}
 
                         </tr>
                         <tr>
@@ -651,7 +665,7 @@ class NewEnrollment extends React.Component {
                         </tr>
                         <tr>
                             <td style={{padding: "0px", border: "none" }}>{this.fieldRenderer(this.state.fields["guardianName1"])}</td>
-                            <td style={{padding: "0px", border: "none", paddingLeft: "15px"}}>{this.fieldRenderer(this.state.fields["guardianName2"])}</td>
+                            {/* <td style={{padding: "0px", border: "none", paddingLeft: "15px"}}>{this.fieldRenderer(this.state.fields["guardianName2"])}</td> */}
                         </tr>
 
                     </tbody>

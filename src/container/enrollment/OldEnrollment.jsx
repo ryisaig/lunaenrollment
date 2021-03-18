@@ -301,7 +301,8 @@ class NewEnrollment extends React.Component {
     }
 
     componentWillMount(){
-        this.getCourses();    
+        this.getCourses();  
+        this.getRequirements();  
     }
 
     autogenerateClasses(){
@@ -505,7 +506,12 @@ class NewEnrollment extends React.Component {
         })
     }
 
-    
+    getRequirements(){
+      axios.get(BASE_SERVER_URL + 'requirement',  { params: {...GenericRequest(), keyword: this.state.keyword}})
+      .then(res => {
+          this.setState({requirements: res.data})
+      })
+  }
 
     classFormChange(e){
       this.setState({enteredClassCode: e.target.value})
@@ -521,9 +527,13 @@ class NewEnrollment extends React.Component {
                   <Card.Body>
                     <span style={{fontWeight: 'bold'}}>Pls. prepare the ff. requirements:</span><br/><br/>
                     <ul>
-                      {/* <li>TODO Pull this from database</li> */}
-                      <li>Certificate of Grades</li>
-                      <li>Clearance Form</li>                  
+                      {/* <li>TODO Pull this from database</li> */} 
+
+                      {
+                        this.state.requirements && this.state.requirements.map((r)=>{
+                          return r.type === "OLD STUDENT" && <li>{r.requirementName}</li>
+                        })
+                      }
                     </ul>
                   </Card.Body>
                 </Card>     

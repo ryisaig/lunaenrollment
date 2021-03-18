@@ -200,20 +200,20 @@ class EditNewEnrollmentDetails extends React.Component {
               this.setState({fields: fields})
             }.bind(this)
           },
-          "occupation" : {
-            id: "occupation",
-            name: "occupation",
-            label: "Occupation",
-            placeholder: "",
-            overrideStyle: {},
-            isRequired: true,
-            type: "text",
-            selectValueChange: function(value){
-              let fields = this.state.fields;
-              fields["occupation"].value = value;
-              this.setState({fields: fields})
-            }.bind(this)
-          },
+          // "occupation" : {
+          //   id: "occupation",
+          //   name: "occupation",
+          //   label: "Occupation",
+          //   placeholder: "",
+          //   overrideStyle: {},
+          //   isRequired: true,
+          //   type: "text",
+          //   selectValueChange: function(value){
+          //     let fields = this.state.fields;
+          //     fields["occupation"].value = value;
+          //     this.setState({fields: fields})
+          //   }.bind(this)
+          // },
           "emailAddress" : {
             id: "emailAddress",
             name: "emailAddress",
@@ -259,7 +259,7 @@ class EditNewEnrollmentDetails extends React.Component {
           "guardianName1" : {
             id: "guardianName1",
             name: "guardianName1",
-            label: "Guardian 1",
+            label: "Parent / Guardian",
             placeholder: "",
             overrideStyle: {},
             isRequired: true,
@@ -271,20 +271,20 @@ class EditNewEnrollmentDetails extends React.Component {
             }.bind(this)
           },
           
-          "guardianName2" : {
-            id: "guardianName2",
-            name: "guardianName2",
-            label: "Guardian 2",
-            placeholder: "",
-            overrideStyle: {},
-            isRequired: false,
-            type: "text",
-            selectValueChange: function(value){
-              let fields = this.state.fields;
-              fields["guardianName2"].value = value;
-              this.setState({fields: fields})
-            }.bind(this)
-          },
+          // "guardianName2" : {
+          //   id: "guardianName2",
+          //   name: "guardianName2",
+          //   label: "Guardian 2",
+          //   placeholder: "",
+          //   overrideStyle: {},
+          //   isRequired: false,
+          //   type: "text",
+          //   selectValueChange: function(value){
+          //     let fields = this.state.fields;
+          //     fields["guardianName2"].value = value;
+          //     this.setState({fields: fields})
+          //   }.bind(this)
+          // },
         },
         table: 
             {
@@ -540,9 +540,9 @@ class EditNewEnrollmentDetails extends React.Component {
             presentAddress: fields['presentAddress'].value,
             mobileNumber: fields['mobileNumber'].value,
             emailAddress: fields['emailAddress'].value,
-            occupation: fields['occupation'].value,
+            // occupation: fields['occupation'].value,
             guardianName1: fields['guardianName1'].value,
-            guardianName2: fields['guardianName2'].value,
+            // guardianName2: fields['guardianName2'].value,
             yearLevel: fields['year'].value,
             course: {
               id: fields['course'].value,
@@ -604,9 +604,9 @@ class EditNewEnrollmentDetails extends React.Component {
         fields['presentAddress'].value = res.data.presentAddress
         fields['mobileNumber'].value = res.data.mobileNumber
         fields['emailAddress'].value = res.data.emailAddress
-        fields['occupation'].value = res.data.occupation
+        // fields['occupation'].value = res.data.
         fields['guardianName1'].value = res.data.guardianName1
-        fields['guardianName2'].value = res.data.guardianName2
+        // fields['guardianName2'].value = res.data.guardianName2
         fields['year'].value = res.data.yearLevel
         fields["isRegular"].checked = res.data.regular;
         fields["age"].value = this.calculate_age(fields['birthday'].value);
@@ -677,7 +677,7 @@ class EditNewEnrollmentDetails extends React.Component {
                         <tr>
                             <td style={{padding: "0px", border: "none" }}>{this.fieldRenderer(this.state.fields["gender"])}</td>
                             <td style={{padding: "0px", border: "none", paddingLeft: "15px"}}>{this.fieldRenderer(this.state.fields["civilStatus"])}</td>
-                            <td style={{padding: "0px", border: "none", paddingLeft: "15px" }}>{this.fieldRenderer(this.state.fields["occupation"])}</td>
+                            {/* <td style={{padding: "0px", border: "none", paddingLeft: "15px" }}>{this.fieldRenderer(this.state.fields["occupation"])}</td> */}
 
                         </tr>
                         <tr>
@@ -693,7 +693,7 @@ class EditNewEnrollmentDetails extends React.Component {
                         </tr>
                         <tr>
                             <td style={{padding: "0px", border: "none" }}>{this.fieldRenderer(this.state.fields["guardianName1"])}</td>
-                            <td style={{padding: "0px", border: "none", paddingLeft: "15px"}}>{this.fieldRenderer(this.state.fields["guardianName2"])}</td>
+                            {/* <td style={{padding: "0px", border: "none", paddingLeft: "15px"}}>{this.fieldRenderer(this.state.fields["guardianName2"])}</td> */}
                         </tr>
 
                     </tbody>

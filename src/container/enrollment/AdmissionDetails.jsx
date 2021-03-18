@@ -75,11 +75,11 @@ class AdmissionDetails extends React.Component {
           label: "Age",
           value: ""
         },
-        {
-          id: "occupation",
-          label: "Occupation",
-          value: ""
-        },
+        // {
+        //   id: "occupation",
+        //   label: "Occupation",
+        //   value: ""
+        // },
         {
           id: "presentAddress",
           label: "Present Address",
@@ -97,14 +97,14 @@ class AdmissionDetails extends React.Component {
         },
         {
           id: "guardianName1",
-          label: "Guardian 1",
+          label: "Parent / Guardian",
           value: ""
         },
-        {
-          id: "guardianName2",
-          label: "Guardian 2",
-          value: ""
-        },
+        // {
+        //   id: "guardianName2",
+        //   label: "Guardian 2",
+        //   value: ""
+        // },
         {
           id: "createdDateTime",
           label: "Date Created",
@@ -181,10 +181,10 @@ class AdmissionDetails extends React.Component {
               field.value = "" + res.data.birthday;
             }else if(field.id == 'guardianName1'){
               field.value = "" + res.data.guardianName1;
-            }else if(field.id == 'guardianName2'){
-              field.value = "" + res.data.guardianName2;
-            }else if(field.id == 'occupation'){
-              field.value = "" + res.data.occupation;
+            // }else if(field.id == 'guardianName2'){
+            //   field.value = "" + res.data.guardianName2;
+            // }else if(field.id == 'occupation'){
+            //   field.value = "" + res.data.occupation;
             }else if(field.id == 'age'){
               field.value = "" + this.calculate_age(res.data.birthday)
             }else if(field.id == 'updatedBy'){
