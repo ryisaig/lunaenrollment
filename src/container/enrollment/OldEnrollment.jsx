@@ -28,6 +28,7 @@ class NewEnrollment extends React.Component {
         successMessage: "New student has been created",
         enteredClassCode: "",
         submitDisabled: false,
+        totalUnits: 0,
         fields: {
           "course": {
             id: "course",
@@ -64,7 +65,7 @@ class NewEnrollment extends React.Component {
           "isRegular" : {
             id: "isRegular",
             name: "isRegular",
-            label: <label>Regular <span style={{color: "red", fontSize: "12px"}}>*Keep this unchecked if you are enrolling as irregular student</span></label>,
+            label: <label>Regular</label>,
             placeholder: "",
             overrideStyle: {},
             isRequired: false,
@@ -74,7 +75,26 @@ class NewEnrollment extends React.Component {
               let fields = this.state.fields;
               fields["isRegular"].value = value;
               fields["isRegular"].checked = !fields["isRegular"].checked;
-
+              fields["isNotRegular"].checked = false;
+              fields["isNotRegular"].value = false;
+              this.setState({fields: fields})
+            }.bind(this)
+          },
+          "isNotRegular" : {
+            id: "isNotRegular",
+            name: "isNotRegular",
+            label: <label>Irregular</label>,
+            placeholder: "",
+            overrideStyle: {},
+            isRequired: false,
+            readOnly: true,
+            type: "check",
+            selectValueChange: function(value){
+              let fields = this.state.fields;
+              fields["isNotRegular"].value = value;
+              fields["isNotRegular"].checked = !fields["isNotRegular"].checked;
+              fields["isRegular"].checked = false;
+              fields["isRegular"].value = false;
               this.setState({fields: fields})
             }.bind(this)
           },
@@ -215,6 +235,7 @@ class NewEnrollment extends React.Component {
                     }},
                 {dataField: "classCode", text: "Class Code", sort: true},
                 {dataField: "subject", text: "Subject", sort: true},
+                {dataField: "unit", text: "Unit", sort: true},
                 {dataField: "section", text: "Section", sort: true},
                 {dataField: "teacher", text: "Teacher", sort: true},
                 {dataField: "room", text: "Room", sort: true},
@@ -314,6 +335,7 @@ class NewEnrollment extends React.Component {
           } else {
             axios.get(BASE_SERVER_URL+ 'class/autogenerate',  { params: {...GenericRequest(), courseId: course.value, yearLevel: year.value}}).then((res) => {
               let table = this.state.table;
+              let totalUnits = this.state.totalUnits;
               table.data = [];
               res.data.map(function(item){
                 let result = {};
@@ -325,6 +347,8 @@ class NewEnrollment extends React.Component {
                 result['teacher'] = item.teacher.lastName.toUpperCase() + ", " + item.teacher.firstName
                 result['room'] = item.room ? item.room.roomName: "TBD"
                 result['status'] = item.status;
+                result['unit'] = item.subject.unit;
+                totalUnits += item.subject.unit;
                 let schedule = "";
                 item.schedule.map(function(sched, i){
                   if(i != 0){
@@ -337,7 +361,7 @@ class NewEnrollment extends React.Component {
                 table.data.push(result)
               })
               
-              this.setState({table: table})
+              this.setState({table: table, totalUnits: totalUnits})
       
             })
           }
@@ -364,6 +388,7 @@ class NewEnrollment extends React.Component {
     addClassToList(){
       let classCode = this.state.enteredClassCode;
       let table = this.state.table;
+      let totalUnits = this.state.totalUnits;
       let previouslyAdded = false;
       this.state.table.data.map(function(entry){
         if(entry.classCode == classCode){
@@ -388,6 +413,7 @@ class NewEnrollment extends React.Component {
           result['room'] = res.data.room.roomName;
           result['status'] = res.data.status;
           result['id'] = res.data.id;
+          result['unit'] = res.data.subject.unit;
 
           let schedule = "";
           res.data.schedule.map(function(sched, i){
@@ -397,10 +423,10 @@ class NewEnrollment extends React.Component {
             schedule += sched.day + " " + sched.time.timeStart + "-" + sched.time.timeEnd;
           })
           result['schedule'] = schedule;
-  
+          totalUnits += res.data.subject.unit;
           table.data.push(result)
         }
-        this.setState({table: table})
+        this.setState({table: table, totalUnits: totalUnits})
       }.bind(this)
       axios.get(BASE_SERVER_URL+ 'class/byClassCode',  { params: {...GenericRequest(), classCode: classCode}}).then((res) => classCodeFunc(res))
     }
@@ -409,19 +435,21 @@ class NewEnrollment extends React.Component {
 
     async delete(classCode){
       let table  = this.state.table;
+      let totalUnits = this.state.totalUnits;
       let num = 0;
       let filteredData = table.data.filter(function(item){
 
         if(item.classCode != classCode){
           num++;
           item.no = num;
+          totalUnits -= item.unit;
           return true;
         }
       })
 
       table.data = filteredData;
 
-      this.setState({table: table});
+      this.setState({table: table, totalUnits: totalUnits});
 
     }
 
@@ -542,6 +570,7 @@ class NewEnrollment extends React.Component {
                     <tbody>
                         <tr>
                             <td style={{padding: "0px", border: "none"}}>{this.fieldRenderer(this.state.fields["isRegular"])}</td>
+                            <td style={{padding: "0px", border: "none"}}>{this.fieldRenderer(this.state.fields["isNotRegular"])}</td>
                         </tr>
                         <tr>
                             <td style={{padding: "0px", border: "none"}}>{this.fieldRenderer(this.state.fields["course"])}</td>
@@ -576,6 +605,7 @@ class NewEnrollment extends React.Component {
              </InputGroup>
             <div>
                 <ViewTable values={this.state.table}/>
+                <label>Total Units: {this.state.totalUnits}</label>
             </div>
             <br/><br/>
             <Button disabled={this.state.submitDisabled} type="submit" variant="outline-info">

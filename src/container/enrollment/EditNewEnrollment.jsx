@@ -296,6 +296,7 @@ class EditNewEnrollmentDetails extends React.Component {
                     }},
                 {dataField: "classCode", text: "Class Code", sort: true},
                 {dataField: "subject", text: "Subject", sort: true},
+                {dataField: "unit", text: "Unit", sort: true},
                 {dataField: "section", text: "Section", sort: true},
                 {dataField: "teacher", text: "Teacher", sort: true},
                 {dataField: "room", text: "Room", sort: true},
@@ -403,6 +404,7 @@ class EditNewEnrollmentDetails extends React.Component {
                 result['no'] = table.data.length + 1;
                 result['classCode'] = item.classCode
                 result['subject'] = item.subject.subjectCode;
+                result['unit'] = item.subject.unit;
                 result['section'] = item.section.course.courseCode + " " + item.section.year + "-" + item.section.sectionNumber;
                 result['teacher'] = item.teacher.lastName.toUpperCase() + ", " + item.teacher.firstName
                 result['room'] = item.room.roomName;
@@ -465,6 +467,8 @@ class EditNewEnrollmentDetails extends React.Component {
           result['no'] = table.data.length + 1;
           result['classCode'] = res.data.classCode
           result['subject'] = res.data.subject.subjectCode;
+          result['unit'] = res.data.subject.unit;
+
           result['section'] = res.data.section.course.courseCode + " " + res.data.section.year + "-" + res.data.section.sectionNumber;
           result['teacher'] = res.data.teacher.lastName.toUpperCase() + ", " + res.data.teacher.firstName
           result['room'] = res.data.room.roomName;
@@ -622,6 +626,8 @@ class EditNewEnrollmentDetails extends React.Component {
           result['no'] = table.data.length + 1;
           result['classCode'] = item.classCode
           result['subject'] = item.subject.subjectCode;
+          result['unit'] = item.subject.unit;
+
           result['section'] = item.section.course.courseCode + " " + item.section.year + "-" + item.section.sectionNumber;
           result['teacher'] = item.teacher.lastName.toUpperCase() + ", " + item.teacher.firstName
           result['room'] = item.room.roomName;

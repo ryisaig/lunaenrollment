@@ -11,7 +11,7 @@ function ViewTable(props) {
     sizePerPage: 10, // Specify the size per page. It's necessary when remote is enabled
     totalSize: props.values.data.length, // Total data size. It's necessary when remote is enabled
     pageStartIndex: 1, // first page will be 0, default is 1
-    showTotal: true, // display pagination information
+    showTotal: false, // display pagination information
     sizePerPageList: [{
       text: '5', value: 5
     }, {
